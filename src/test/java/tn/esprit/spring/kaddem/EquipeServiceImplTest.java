@@ -5,7 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import tn.esprit.spring.kaddem.entities.DetailEquipe;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.spring.kaddem.entities.Equipe;
 import tn.esprit.spring.kaddem.entities.Niveau;
 import tn.esprit.spring.kaddem.repositories.EquipeRepository;
@@ -16,6 +17,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@ActiveProfiles("test") // Use the 'test' profile for H2 database
+@Transactional
 public class EquipeServiceImplTest {
 
     @Autowired
@@ -26,14 +29,12 @@ public class EquipeServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        // Clear the repository before each test
-        equipeRepository.deleteAll();
+        equipeRepository.deleteAll(); // Clear repository before each test
     }
 
     @AfterEach
     void tearDown() {
-        // Clear the repository after each test
-        equipeRepository.deleteAll();
+        equipeRepository.deleteAll(); // Clear repository after each test
     }
 
     @Test
