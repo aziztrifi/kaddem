@@ -33,4 +33,20 @@ public class SubDepartementServiceImpl {
         SubDepartement d=retrieveSubDepartement(idDepartement);
         subDepartementRepository.delete(d);
     }
+
+    public List<SubDepartement> findByNomDepart(String nomDepart) {
+        return subDepartementRepository.findByNomDepart(nomDepart);
+    }
+    public List<SubDepartement> addSubDepartements(List<SubDepartement> subDepartements) {
+        return (List<SubDepartement>) subDepartementRepository.saveAll(subDepartements);
+    }
+    public long countSubDepartementsByDepartement(long departementId) {
+        return subDepartementRepository.countByDepartementId(departementId);
+    }
+
+    public List<SubDepartement> findByDescriptionContaining(String keyword) {
+        return subDepartementRepository.findByDescriptionContaining(keyword);
+    }
+
+
 }

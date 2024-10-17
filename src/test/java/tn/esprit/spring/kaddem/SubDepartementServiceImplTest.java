@@ -13,6 +13,7 @@ import tn.esprit.spring.kaddem.repositories.SubDepartementRepository;
 import tn.esprit.spring.kaddem.services.DepartementServiceImpl;
 import tn.esprit.spring.kaddem.services.SubDepartementServiceImpl;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -126,6 +127,95 @@ public class SubDepartementServiceImplTest {
         departementService.deleteSubDepartement(savedDepartement.getIdSubDepart());
 
         assertFalse(departementRepository.findById(savedDepartement.getIdSubDepart()).isPresent());
+    }
+
+    @Test
+    void testAddSubDepartements() {
+        SubDepartement subDepartement1 = new SubDepartement();
+        subDepartement1.setNomDepart("HR");
+        subDepartement1.setDescription("Human Resources");
+        Departement dep1 = new Departement();
+        dep1.setNomDepart("Human Capital");
+        subDepartement1.setDepartement(dep1);
+
+        SubDepartement subDepartement2 = new SubDepartement();
+        subDepartement2.setNomDepart("IT Support");
+        subDepartement2.setDescription("Support for IT");
+        Departement dep2 = new Departement();
+        dep2.setNomDepart("IT Department");
+        subDepartement2.setDepartement(dep2);
+
+        List<SubDepartement> subDepartements = Arrays.asList(subDepartement1, subDepartement2);
+        List<SubDepartement> savedSubDepartements = departementService.addSubDepartements(subDepartements);
+
+        assertEquals(2, savedSubDepartements.size());
+        assertNotNull(savedSubDepartements.get(0).getIdSubDepart());
+        assertNotNull(savedSubDepartements.get(1).getIdSubDepart());
+    }
+
+    @Test
+    void testCountSubDepartementsByDepartement() {
+        Departement dep = new Departement();
+        dep.setNomDepart("Finance");
+
+        SubDepartement subDepartement1 = new SubDepartement();
+        subDepartement1.setNomDepart("Accounts");
+        subDepartement1.setDescription("Accounts Department");
+        subDepartement1.setDepartement(dep);
+
+        SubDepartement subDepartement2 = new SubDepartement();
+        subDepartement2.setNomDepart("Budgeting");
+        subDepartement2.setDescription("Budgeting Department");
+        subDepartement2.setDepartement(dep);
+
+        departementRepository.save(subDepartement1);
+        departementRepository.save(subDepartement2);
+
+        long count = departementService.countSubDepartementsByDepartement(dep.getIdDepart());
+
+        assertEquals(2, count);
+    }
+
+    @Test
+    void testFindByDescriptionContaining() {
+        SubDepartement subDepartement1 = new SubDepartement();
+        subDepartement1.setNomDepart("Logistics");
+        subDepartement1.setDescription("Handles logistics efficiently");
+
+        SubDepartement subDepartement2 = new SubDepartement();
+        subDepartement2.setNomDepart("Sales");
+        subDepartement2.setDescription("Sales operations and management");
+
+        departementRepository.save(subDepartement1);
+        departementRepository.save(subDepartement2);
+
+        List<SubDepartement> results = departementService.findByDescriptionContaining("logistics");
+
+        assertEquals(1, results.size());
+        assertEquals("Logistics", results.get(0).getNomDepart());
+    }
+    @Test
+    void testFindByNomDepart() {
+        SubDepartement subDepartement1 = new SubDepartement();
+        subDepartement1.setNomDepart("Marketing");
+        subDepartement1.setDescription("Marketing Department");
+        Departement dep1 = new Departement();
+        dep1.setNomDepart("Sales");
+        subDepartement1.setDepartement(dep1);
+        departementRepository.save(subDepartement1);
+
+        SubDepartement subDepartement2 = new SubDepartement();
+        subDepartement2.setNomDepart("Finance");
+        subDepartement2.setDescription("Finance Department");
+        Departement dep2 = new Departement();
+        dep2.setNomDepart("Finance");
+        subDepartement2.setDepartement(dep2);
+        departementRepository.save(subDepartement2);
+
+        List<SubDepartement> results = departementService.findByNomDepart("Marketing");
+
+        assertEquals(1, results.size());
+        assertEquals("Marketing", results.get(0).getNomDepart());
     }
 
 }
