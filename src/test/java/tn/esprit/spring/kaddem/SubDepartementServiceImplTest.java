@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import tn.esprit.spring.kaddem.entities.Departement;
 import tn.esprit.spring.kaddem.entities.SubDepartement;
-import tn.esprit.spring.kaddem.repositories.DepartementRepository;
 import tn.esprit.spring.kaddem.repositories.SubDepartementRepository;
 import tn.esprit.spring.kaddem.services.DepartementServiceImpl;
 import tn.esprit.spring.kaddem.services.SubDepartementServiceImpl;
