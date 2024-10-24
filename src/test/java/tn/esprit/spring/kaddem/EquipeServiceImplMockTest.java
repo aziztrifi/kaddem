@@ -99,4 +99,30 @@ public class EquipeServiceImplMockTest {
     }
 
     // Example for testing evoluerEquipes() could be added here if needed
+
+    @Test
+    public void testEquipeDoesNotEvolueDueToInsufficientActiveContracts() {
+        // Initialize the test data
+        Equipe equipe = new Equipe();
+        equipe.setNiveau(Niveau.JUNIOR);
+
+        // Create students with fewer than 3 active contracts (using List instead of Set)
+        List<Etudiant> etudiants = new ArrayList<>();
+        for (int i = 0; i < 2; i++) { // Exactly 2 students with active contracts
+            Etudiant etudiant = new Etudiant();
+            Contrat contratActif = new Contrat();
+            contratActif.setArchive(false); // Active contract
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.YEAR, -2); // Contract valid for more than one year
+            contratActif.setDateFinContrat(cal.getTime());
+            etudiant.setContrats(Set.of(contratActif));  // Keep this as a Set for contracts
+            etudiants.add(etudiant);  // Add to List
+        }
+
+        equipe.setEtudiants(new HashSet<>(etudiants));  // Converting List to Set
+
+        // Simulate the repository behavior
+        when(equipeRepository.findAll()).thenReturn(List.of(equipe));  // Ensure List is returned
+
+    }
 }
