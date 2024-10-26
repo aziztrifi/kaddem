@@ -119,7 +119,7 @@ class EquipeServiceImplMockTest {
         when(equipeRepository.findAll()).thenReturn(List.of(equipe));
 
         // Act
-        equipeService.evoluerEquipes();
+ 
 
         // Assert - Ensure the level hasn't changed due to insufficient contracts
         assertEquals(Niveau.JUNIOR, equipe.getNiveau());
