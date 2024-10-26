@@ -6,7 +6,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import tn.esprit.spring.kaddem.entities.Contrat;
-import tn.esprit.spring.kaddem.entities.DetailEquipe;
 import tn.esprit.spring.kaddem.entities.Equipe;
 import tn.esprit.spring.kaddem.entities.Etudiant;
 import tn.esprit.spring.kaddem.entities.Niveau;
@@ -19,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-public class EquipeServiceImplMockTest {
+class EquipeServiceImplMockTest {
 
     @InjectMocks
     private EquipeServiceImpl equipeService;
@@ -98,31 +97,31 @@ public class EquipeServiceImplMockTest {
         verify(equipeRepository, times(1)).delete(equipe);
     }
 
-    // Example for testing evoluerEquipes() could be added here if needed
-
     @Test
-    public void testEquipeDoesNotEvolueDueToInsufficientActiveContracts() {
-        // Initialize the test data
+    void testEquipeDoesNotEvolueDueToInsufficientActiveContracts() {
         Equipe equipe = new Equipe();
         equipe.setNiveau(Niveau.JUNIOR);
 
-        // Create students with fewer than 3 active contracts (using List instead of Set)
         List<Etudiant> etudiants = new ArrayList<>();
-        for (int i = 0; i < 2; i++) { // Exactly 2 students with active contracts
+        for (int i = 0; i < 2; i++) { // Only 2 students with active contracts
             Etudiant etudiant = new Etudiant();
             Contrat contratActif = new Contrat();
             contratActif.setArchive(false); // Active contract
             Calendar cal = Calendar.getInstance();
-            cal.add(Calendar.YEAR, -2); // Contract valid for more than one year
+            cal.add(Calendar.YEAR, -2); // Contract active for more than one year
             contratActif.setDateFinContrat(cal.getTime());
-            etudiant.setContrats(Set.of(contratActif));  // Keep this as a Set for contracts
-            etudiants.add(etudiant);  // Add to List
+            etudiant.setContrats(Set.of(contratActif));
+            etudiants.add(etudiant);
         }
 
-        equipe.setEtudiants(new HashSet<>(etudiants));  // Converting List to Set
+        equipe.setEtudiants(new HashSet<>(etudiants));
 
-        // Simulate the repository behavior
-        when(equipeRepository.findAll()).thenReturn(List.of(equipe));  // Ensure List is returned
+        when(equipeRepository.findAll()).thenReturn(List.of(equipe));
 
+        // Act
+        equipeService.evoluerEquipes();
+
+        // Assert - Ensure the level hasn't changed due to insufficient contracts
+        assertEquals(Niveau.JUNIOR, equipe.getNiveau());
     }
 }
