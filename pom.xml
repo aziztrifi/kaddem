@@ -28,7 +28,7 @@
         <snapshotRepository>
             <id>snapshotRepo</id>
             <name>Nexus Snapshot Repository</name>
-            <url>http://localhost:8081/repository/maven-snapshots/</url>
+            <url>http://localhost:8081/repository/kaddem/</url>
         </snapshotRepository>
     </distributionManagement>
 
