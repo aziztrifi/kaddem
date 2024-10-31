@@ -2,7 +2,6 @@ package tn.esprit.spring.kaddem.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import lombok.extern.slf4j.Slf4j;
 import tn.esprit.spring.kaddem.entities.Contrat;
 import tn.esprit.spring.kaddem.entities.Etudiant;
@@ -16,107 +15,122 @@ import java.util.Set;
 
 @Slf4j
 @Service
-public class ContratServiceImpl implements IContratService{
-private final ContratRepository contratRepository;
-final
-EtudiantRepository etudiantRepository;
+public class ContratServiceImpl implements IContratService {
+
+	private final ContratRepository contratRepository;
+	private final EtudiantRepository etudiantRepository;
 
 	public ContratServiceImpl(ContratRepository contratRepository, EtudiantRepository etudiantRepository) {
 		this.contratRepository = contratRepository;
 		this.etudiantRepository = etudiantRepository;
 	}
 
-	public List<Contrat> retrieveAllContrats(){
+	@Override
+	public List<Contrat> retrieveAllContrats() {
 		return contratRepository.findAll();
 	}
 
-	public Contrat updateContrat (Contrat  ce){
+	@Override
+	public Contrat updateContrat(Contrat ce) {
 		return contratRepository.save(ce);
 	}
 
-	public  Contrat addContrat (Contrat ce){
+	@Override
+	public Contrat addContrat(Contrat ce) {
 		return contratRepository.save(ce);
 	}
 
-	public Contrat retrieveContrat (Integer  idContrat){
-		return contratRepository.findById(idContrat).orElse(null);
+	@Override
+	public Contrat retrieveContrat(Integer idContrat) {
+		return contratRepository.findById(idContrat)
+				.orElseThrow(() -> new IllegalArgumentException("Contrat not found with id: " + idContrat));
 	}
 
-	public  void removeContrat(Integer idContrat){
-		Contrat c=retrieveContrat(idContrat);
+	@Override
+	public void removeContrat(Integer idContrat) {
+		Contrat c = retrieveContrat(idContrat);
 		contratRepository.delete(c);
 	}
 
-
-
-	public Contrat affectContratToEtudiant (Integer idContrat, String nomE, String prenomE){
-		Etudiant e=etudiantRepository.findByNomEAndPrenomE(nomE, prenomE);
-		Contrat ce=contratRepository.findByIdContrat(idContrat);
-		Set<Contrat> contrats= e.getContrats();
-		int nbContratssActifs=0;
-		if (!contrats.isEmpty()) {
-			for (Contrat contrat : contrats) {
-				if (((contrat.getArchive())!=null)&& Boolean.TRUE.equals((contrat.getArchive())))  {
-					nbContratssActifs++;
-				}
-			}
+	@Override
+	public Contrat affectContratToEtudiant(Integer idContrat, String nomE, String prenomE) {
+		Etudiant e = etudiantRepository.findByNomEAndPrenomE(nomE, prenomE);
+		if (e == null) {
+			throw new IllegalArgumentException("Etudiant not found with name: " + nomE + " " + prenomE);
 		}
-		if (nbContratssActifs<=4){
-		ce.setEtudiant(e);
-		contratRepository.save(ce);}
+
+		Contrat ce = contratRepository.findByIdContrat(idContrat);
+		if (ce == null) {
+			throw new IllegalArgumentException("Contrat not found with id: " + idContrat);
+		}
+
+		Set<Contrat> contrats = e.getContrats();
+		long activeContractsCount = contrats.stream()
+				.filter(contrat -> Boolean.TRUE.equals(contrat.getArchive()))
+				.count();
+
+		// Ensure active contracts do not exceed the limit
+		if (activeContractsCount < 5) {
+			ce.setEtudiant(e);
+			contratRepository.save(ce);
+		} else {
+			log.warn("Etudiant already has the maximum number of active contracts.");
+		}
 		return ce;
 	}
-	public 	Integer nbContratsValides(Date startDate, Date endDate){
+
+	@Override
+	public Integer nbContratsValides(Date startDate, Date endDate) {
 		return contratRepository.getnbContratsValides(startDate, endDate);
 	}
 
-	public void retrieveAndUpdateStatusContrat(){
-		List<Contrat>contrats=contratRepository.findAll();
-		List<Contrat>contrats15j=null;
-		List<Contrat>contratsAarchiver=null;
+	@Override
+	public void retrieveAndUpdateStatusContrat() {
+		List<Contrat> contrats = contratRepository.findAll();
+		Date currentDate = new Date();
+
 		for (Contrat contrat : contrats) {
-			Date dateSysteme = new Date();
 			if (!Boolean.TRUE.equals(contrat.getArchive())) {
-				long difference_In_Time = dateSysteme.getTime() - contrat.getDateFinContrat().getTime();
-				long difference_In_Days = (difference_In_Time / (1000 * 60 * 60 * 24)) % 365;
-				if (difference_In_Days==15){
-                    assert false;
-                    contrats15j.add(contrat);
-					log.info(" Contrat : " + contrat);
-				}
-				if (difference_In_Days==0) {
-                    assert false;
-                    contratsAarchiver.add(contrat);
+				long differenceInDays = (currentDate.getTime() - contrat.getDateFinContrat().getTime()) / (1000 * 60 * 60 * 24);
+
+				if (differenceInDays == 15) {
+					log.info("15 days before expiration for Contrat: " + contrat);
+					// Add further actions if needed, e.g., send notification
+				} else if (differenceInDays == 0) {
 					contrat.setArchive(true);
 					contratRepository.save(contrat);
+					log.info("Contract archived for Contrat: " + contrat);
 				}
 			}
 		}
 	}
-	public float getChiffreAffaireEntreDeuxDates(Date startDate, Date endDate){
-		float difference_In_Time = endDate.getTime() - startDate.getTime();
-		float difference_In_Days = (difference_In_Time / (1000 * 60 * 60 * 24)) % 365;
-		float difference_In_months =difference_In_Days/30;
-        List<Contrat> contrats=contratRepository.findAll();
-		float chiffreAffaireEntreDeuxDates=0;
+
+	@Override
+	public float getChiffreAffaireEntreDeuxDates(Date startDate, Date endDate) {
+		long differenceInDays = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
+		float differenceInMonths = differenceInDays / 30f;
+
+		List<Contrat> contrats = contratRepository.findAll();
+		float totalRevenue = 0;
+
 		for (Contrat contrat : contrats) {
-			if (contrat.getSpecialite()== Specialite.IA){
-				chiffreAffaireEntreDeuxDates+=(difference_In_months*300);
-			} else if (contrat.getSpecialite()== Specialite.CLOUD) {
-				chiffreAffaireEntreDeuxDates+=(difference_In_months*400);
+			float contractRevenue = 0;
+			switch (contrat.getSpecialite()) {
+				case IA:
+					contractRevenue = differenceInMonths * 300;
+					break;
+				case CLOUD:
+					contractRevenue = differenceInMonths * 400;
+					break;
+				case RESEAUX:
+					contractRevenue = differenceInMonths * 350;
+					break;
+				default:
+					contractRevenue = differenceInMonths * 450;
+					break;
 			}
-			else if (contrat.getSpecialite()== Specialite.RESEAUX) {
-				chiffreAffaireEntreDeuxDates+=(difference_In_months*350);
-			}
-			else
-			 {
-				 chiffreAffaireEntreDeuxDates+=(difference_In_months*450);
-			}
+			totalRevenue += contractRevenue;
 		}
-		return chiffreAffaireEntreDeuxDates;
-
-
+		return totalRevenue;
 	}
-
-
 }
