@@ -6,7 +6,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.7.5</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/> 
     </parent>
     <groupId>tn.esprit.spring</groupId>
     <artifactId>kaddem</artifactId>
@@ -15,12 +15,9 @@
     <description>kaddem</description>
     <properties>
         <java.version>1.8</java.version>
-        <sonar.token>${env.SONAR_TOKEN}</sonar.token>
-        <sonar.host.url>http://192.168.50.4:9000</sonar.host.url>
+        <sonar.token>squ_cb8d11958c6ae16f8d25263d1575ae5ac99b446f</sonar.token>
+    <sonar.host.url>http://192.168.50.4:9000</sonar.host.url>
     </properties>
-
-
-
     <distributionManagement>
         <repository>
             <id>deploymentRepo</id>
@@ -33,27 +30,20 @@
             <url>http://localhost:8081/repository/kaddem/</url>
         </snapshotRepository>
     </distributionManagement>
-
-
-
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <scope>runtime</scope>
         </dependency>
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
