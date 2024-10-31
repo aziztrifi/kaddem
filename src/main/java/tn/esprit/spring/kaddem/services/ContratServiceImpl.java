@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-
 @Slf4j
 @Service
 public class ContratServiceImpl implements IContratService{
@@ -45,89 +44,72 @@ public class ContratServiceImpl implements IContratService{
 
 
 
-    public Contrat affectContratToEtudiant(Integer idContrat, String nomE, String prenomE) {
-        Etudiant etudiant = etudiantRepository.findByNomEAndPrenomE(nomE, prenomE);
-        Contrat contratToAssign = contratRepository.findByIdContrat(idContrat);
-
-        if (etudiant == null || contratToAssign == null) {
-            throw new IllegalArgumentException("Etudiant or Contrat not found");
+    public Contrat affectContratToEtudiant (Integer idContrat, String nomE, String prenomE){
+        Etudiant e=etudiantRepository.findByNomEAndPrenomE(nomE, prenomE);
+        Contrat ce=contratRepository.findByIdContrat(idContrat);
+        Set<Contrat> contrats= e.getContrats();
+        Integer nbContratssActifs=0;
+        if (!contrats.isEmpty()) {
+            for (Contrat contrat : contrats) {
+                if (((contrat.getArchive())!=null)&& ((contrat.getArchive())))  {
+                    nbContratssActifs++;
+                }
+            }
         }
-        long activeContractsCount = etudiant.getContrats().stream()
-                .filter(contrat -> contrat.getArchive() != null && contrat.getArchive())
-                .count();
-        if (contratToAssign.getArchive() != null && contratToAssign.getArchive()) {
-            activeContractsCount++;
-        }
-        if (activeContractsCount <= 4) {
-            contratToAssign.setEtudiant(etudiant);
-            contratRepository.save(contratToAssign);
-        }
-
-        return contratToAssign;
+        if (nbContratssActifs<=4){
+            ce.setEtudiant(e);
+            contratRepository.save(ce);}
+        return ce;
     }
-
-
     public 	Integer nbContratsValides(Date startDate, Date endDate){
         return contratRepository.getnbContratsValides(startDate, endDate);
     }
 
-    public void retrieveAndUpdateStatusContrat() {
-        List<Contrat> contrats = contratRepository.findAll();
-        List<Contrat> contrats15Days = new ArrayList<>();
-        List<Contrat> contratsToArchive = new ArrayList<>();
-        Date currentDate = new Date();
-
+    public void retrieveAndUpdateStatusContrat(){
+        List<Contrat>contrats=contratRepository.findAll();
+        List<Contrat>contrats15j=null;
+        List<Contrat>contratsAarchiver=null;
         for (Contrat contrat : contrats) {
-            if (!Boolean.TRUE.equals(contrat.getArchive())) {
-                long timeDifference = currentDate.getTime() - contrat.getDateFinContrat().getTime();
-                long daysDifference = timeDifference / (1000 * 60 * 60 * 24);
-
-                if (daysDifference == 15) {
-                    contrats15Days.add(contrat);
-                    log.info("Contrat nearing expiration: " + contrat);
+            Date dateSysteme = new Date();
+            if (!contrat.getArchive()) {
+                long difference_In_Time = dateSysteme.getTime() - contrat.getDateFinContrat().getTime();
+                long difference_In_Days = (difference_In_Time / (1000 * 60 * 60 * 24)) % 365;
+                if (difference_In_Days==15){
+                    contrats15j.add(contrat);
+                    log.info(" Contrat : " + contrat);
                 }
-
-                if (daysDifference == 0) {
-                    contratsToArchive.add(contrat);
+                if (difference_In_Days==0) {
+                    contratsAarchiver.add(contrat);
                     contrat.setArchive(true);
                     contratRepository.save(contrat);
                 }
             }
         }
     }
-    public float getChiffreAffaireEntreDeuxDates(Date startDate, Date endDate) {
-        final int IA_RATE = 300;
-        final int CLOUD_RATE = 400;
-        final int RESEAUX_RATE = 350;
-        final int SECURITE_RATE = 450;
-        final int DAYS_IN_MONTH = 30;
-
-        // Calculate the difference in days and months
-        long timeDifference = endDate.getTime() - startDate.getTime();
-        float daysDifference = (float) timeDifference / (1000 * 60 * 60 * 24);
-        float monthsDifference = daysDifference / DAYS_IN_MONTH;
-
-        // Calculate the revenue for the period
-        float revenue = 0;
-        List<Contrat> contrats = contratRepository.findAll();
+    public float getChiffreAffaireEntreDeuxDates(Date startDate, Date endDate){
+        float difference_In_Time = endDate.getTime() - startDate.getTime();
+        float difference_In_Days = (difference_In_Time / (1000 * 60 * 60 * 24)) % 365;
+        float difference_In_months =difference_In_Days/30;
+        List<Contrat> contrats=contratRepository.findAll();
+        float chiffreAffaireEntreDeuxDates=0;
         for (Contrat contrat : contrats) {
-            switch (contrat.getSpecialite()) {
-                case IA:
-                    revenue += monthsDifference * IA_RATE;
-                    break;
-                case CLOUD:
-                    revenue += monthsDifference * CLOUD_RATE;
-                    break;
-                case RESEAUX:
-                    revenue += monthsDifference * RESEAUX_RATE;
-                    break;
-                case SECURITE:
-                    revenue += monthsDifference * SECURITE_RATE;
-                    break;
-                default:
-                    break;
+            if (contrat.getSpecialite()== Specialite.IA){
+                chiffreAffaireEntreDeuxDates+=(difference_In_months*300);
+            } else if (contrat.getSpecialite()== Specialite.CLOUD) {
+                chiffreAffaireEntreDeuxDates+=(difference_In_months*400);
+            }
+            else if (contrat.getSpecialite()== Specialite.RESEAUX) {
+                chiffreAffaireEntreDeuxDates+=(difference_In_months*350);
+            }
+            else
+            {
+                chiffreAffaireEntreDeuxDates+=(difference_In_months*450);
             }
         }
-        return revenue;
+        return chiffreAffaireEntreDeuxDates;
+
+
     }
+
+
 }
