@@ -17,12 +17,17 @@ import java.util.Set;
 @Slf4j
 @Service
 public class ContratServiceImpl implements IContratService{
-@Autowired
-private ContratRepository contratRepository;
-@Autowired
-	EtudiantRepository etudiantRepository;
+private final ContratRepository contratRepository;
+final
+EtudiantRepository etudiantRepository;
+
+	public ContratServiceImpl(ContratRepository contratRepository, EtudiantRepository etudiantRepository) {
+		this.contratRepository = contratRepository;
+		this.etudiantRepository = etudiantRepository;
+	}
+
 	public List<Contrat> retrieveAllContrats(){
-		return (List<Contrat>) contratRepository.findAll();
+		return contratRepository.findAll();
 	}
 
 	public Contrat updateContrat (Contrat  ce){
@@ -51,7 +56,7 @@ private ContratRepository contratRepository;
 		int nbContratssActifs=0;
 		if (!contrats.isEmpty()) {
 			for (Contrat contrat : contrats) {
-				if (((contrat.getArchive())!=null)&& ((contrat.getArchive())))  {
+				if (((contrat.getArchive())!=null)&& Boolean.TRUE.equals((contrat.getArchive())))  {
 					nbContratssActifs++;
 				}
 			}
@@ -75,11 +80,13 @@ private ContratRepository contratRepository;
 				long difference_In_Time = dateSysteme.getTime() - contrat.getDateFinContrat().getTime();
 				long difference_In_Days = (difference_In_Time / (1000 * 60 * 60 * 24)) % 365;
 				if (difference_In_Days==15){
-					contrats15j.add(contrat);
+                    assert false;
+                    contrats15j.add(contrat);
 					log.info(" Contrat : " + contrat);
 				}
 				if (difference_In_Days==0) {
-					contratsAarchiver.add(contrat);
+                    assert false;
+                    contratsAarchiver.add(contrat);
 					contrat.setArchive(true);
 					contratRepository.save(contrat);
 				}
