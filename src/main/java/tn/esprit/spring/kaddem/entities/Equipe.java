@@ -52,7 +52,6 @@ public class Equipe implements Serializable{
         this.etudiants = etudiants;
     }
 
-
     public Integer getIdEquipe() {
         return idEquipe;
     }
