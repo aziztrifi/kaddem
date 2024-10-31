@@ -1,11 +1,14 @@
 package tn.esprit.spring.kaddem.controllers;
 
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.spring.kaddem.entities.Contrat;
+import tn.esprit.spring.kaddem.services.ContratServiceImpl;
 import tn.esprit.spring.kaddem.services.IContratService;
+
 import java.util.Date;
 import java.util.List;
 
@@ -53,20 +56,20 @@ public class ContratRestController {
 
 	@PutMapping(value = "/assignContratToEtudiant/{idContrat}/{nomE}/{prenomE}")
 	public Contrat assignContratToEtudiant (Integer idContrat, String nomE, String prenomE){
-	//	Contrat c= contratService.affectContratToEtudiant()
+		//	Contrat c= contratService.affectContratToEtudiant()
 		return 	(contratService.affectContratToEtudiant(idContrat, nomE, prenomE));
 	}
 
 	//The most common ISO Date Format yyyy-MM-dd — for example, "2000-10-31".
-		@GetMapping(value = "/getnbContratsValides/{startDate}/{endDate}")
-		public Integer getnbContratsValides(@PathVariable(name = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
-										  @PathVariable(name = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+	@GetMapping(value = "/getnbContratsValides/{startDate}/{endDate}")
+	public Integer getnbContratsValides(@PathVariable(name = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
+										@PathVariable(name = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
 
-			return contratService.nbContratsValides(startDate, endDate);
-		}
+		return contratService.nbContratsValides(startDate, endDate);
+	}
 
-    //Only no-arg methods may be annotated with @Scheduled
-    @Scheduled(cron="0 0 13 * * *")//(cron="0 0 13 * * ?")(fixedRate =21600)
+	//Only no-arg methods may be annotated with @Scheduled
+	@Scheduled(cron="0 0 13 * * *")//(cron="0 0 13 * * ?")(fixedRate =21600)
 	@PutMapping(value = "/majStatusContrat")
 	public void majStatusContrat (){
 		//return 	(contratService.affectContratToEtudiant(ce, nomE, prenomE));
@@ -79,10 +82,8 @@ public class ContratRestController {
 	@GetMapping("/calculChiffreAffaireEntreDeuxDate/{startDate}/{endDate}")
 	@ResponseBody
 	public float calculChiffreAffaireEntreDeuxDates(@PathVariable(name = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
-	@PathVariable(name = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
+													@PathVariable(name = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate) {
 
 		return contratService.getChiffreAffaireEntreDeuxDates(startDate, endDate);
 	}
 }
-
-
