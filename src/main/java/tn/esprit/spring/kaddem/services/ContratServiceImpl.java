@@ -17,10 +17,16 @@ import java.util.Set;
 @Slf4j
 @Service
 public class ContratServiceImpl implements IContratService{
-    @Autowired
+    final
     ContratRepository contratRepository;
-    @Autowired
+    final
     EtudiantRepository etudiantRepository;
+
+    public ContratServiceImpl(ContratRepository contratRepository, EtudiantRepository etudiantRepository) {
+        this.contratRepository = contratRepository;
+        this.etudiantRepository = etudiantRepository;
+    }
+
     public List<Contrat> retrieveAllContrats(){
         return contratRepository.findAll();
     }
@@ -48,12 +54,12 @@ public class ContratServiceImpl implements IContratService{
         Etudiant e=etudiantRepository.findByNomEAndPrenomE(nomE, prenomE);
         Contrat ce=contratRepository.findByIdContrat(idContrat);
         Set<Contrat> contrats= e.getContrats();
-        Integer nbContratssActifs=0;
-        if (contrats.size()!=0) {
+        int nbContratssActifs=0;
+        if (!contrats.isEmpty()) {
             for (Contrat contrat : contrats) {
-                if (((contrat.getArchive())!=null)&& ((contrat.getArchive())!=false))  {
-                    nbContratssActifs++;
-                }
+                if (Boolean.TRUE.equals((contrat.getArchive())) && (contrat.getArchive()) != null) {
+                        nbContratssActifs++;
+                    }
             }
         }
         if (nbContratssActifs<=4){
@@ -71,7 +77,7 @@ public class ContratServiceImpl implements IContratService{
         List<Contrat>contratsAarchiver=null;
         for (Contrat contrat : contrats) {
             Date dateSysteme = new Date();
-            if (contrat.getArchive()==false) {
+            if (!contrat.getArchive()) {
                 long difference_In_Time = dateSysteme.getTime() - contrat.getDateFinContrat().getTime();
                 long difference_In_Days = (difference_In_Time / (1000 * 60 * 60 * 24)) % 365;
                 if (difference_In_Days==15){
@@ -101,7 +107,7 @@ public class ContratServiceImpl implements IContratService{
             else if (contrat.getSpecialite()== Specialite.RESEAUX) {
                 chiffreAffaireEntreDeuxDates+=(difference_In_months*350);
             }
-            else //if (contrat.getSpecialite()== Specialite.SECURITE)
+            else if (contrat.getSpecialite()== Specialite.SECURITE)
             {
                 chiffreAffaireEntreDeuxDates+=(difference_In_months*450);
             }
