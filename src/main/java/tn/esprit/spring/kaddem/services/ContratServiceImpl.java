@@ -17,18 +17,12 @@ import java.util.Set;
 @Slf4j
 @Service
 public class ContratServiceImpl implements IContratService{
-    final
+    @Autowired
     ContratRepository contratRepository;
-    final
+    @Autowired
     EtudiantRepository etudiantRepository;
-
-    public ContratServiceImpl(ContratRepository contratRepository, EtudiantRepository etudiantRepository) {
-        this.contratRepository = contratRepository;
-        this.etudiantRepository = etudiantRepository;
-    }
-
     public List<Contrat> retrieveAllContrats(){
-        return contratRepository.findAll();
+        return (List<Contrat>) contratRepository.findAll();
     }
 
     public Contrat updateContrat (Contrat  ce){
@@ -54,12 +48,12 @@ public class ContratServiceImpl implements IContratService{
         Etudiant e=etudiantRepository.findByNomEAndPrenomE(nomE, prenomE);
         Contrat ce=contratRepository.findByIdContrat(idContrat);
         Set<Contrat> contrats= e.getContrats();
-        int nbContratssActifs=0;
-        if (!contrats.isEmpty()) {
+        Integer nbContratssActifs=0;
+        if (contrats.size()!=0) {
             for (Contrat contrat : contrats) {
-                if (Boolean.TRUE.equals((contrat.getArchive())) && (contrat.getArchive()) != null) {
-                        nbContratssActifs++;
-                    }
+                if (((contrat.getArchive())!=null)&& ((contrat.getArchive()))) {
+                    nbContratssActifs++;
+                }
             }
         }
         if (nbContratssActifs<=4){
