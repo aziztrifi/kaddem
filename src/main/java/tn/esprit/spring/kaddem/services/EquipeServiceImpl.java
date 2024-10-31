@@ -42,20 +42,13 @@ public class EquipeServiceImpl implements IEquipeService {
 		return equipeRepository.save(equipe);
 	}
 
-	/**
-	 * This method promotes teams based on their active contracts.
-	 */
+
 	@Override
 	public void evoluerEquipes() {
 		List<Equipe> equipes = retrieveAllEquipes();
 		equipes.forEach(this::processEquipeEvolution);
 	}
 
-	/**
-	 * Checks the conditions for evolving the team's level and applies changes if applicable.
-	 *
-	 * @param equipe the team to check and possibly promote
-	 */
 	private void processEquipeEvolution(Equipe equipe) {
 		if (equipe.getNiveau() == Niveau.JUNIOR || equipe.getNiveau() == Niveau.SENIOR) {
 			int activeContractsCount = countActiveContracts(equipe);
