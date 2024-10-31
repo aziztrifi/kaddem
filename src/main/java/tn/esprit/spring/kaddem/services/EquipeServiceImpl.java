@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import tn.esprit.spring.kaddem.entities.Equipe;
 import tn.esprit.spring.kaddem.entities.Niveau;
 import tn.esprit.spring.kaddem.repositories.EquipeRepository;
-import tn.esprit.spring.kaddem.services.IEquipeService;
+
 
 import java.util.List;
 

@@ -16,18 +16,18 @@ import tn.esprit.spring.kaddem.repositories.EtudiantRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Set;
+
 
 @Service
 @Slf4j
 public class EtudiantServiceImpl implements IEtudiantService{
 	@Autowired
-	EtudiantRepository etudiantRepository ;
-	@Autowired
+	private EtudiantRepository etudiantRepository ;
+
 	ContratRepository contratRepository;
-	@Autowired
+
 	EquipeRepository equipeRepository;
-    @Autowired
+
     DepartementRepository departementRepository;
 	public List<Etudiant> retrieveAllEtudiants(){
 	return (List<Etudiant>) etudiantRepository.findAll();
@@ -53,6 +53,7 @@ public class EtudiantServiceImpl implements IEtudiantService{
 	public void assignEtudiantToDepartement (Integer etudiantId, Integer departementId){
         Etudiant etudiant = etudiantRepository.findById(etudiantId).orElse(null);
         Departement departement = departementRepository.findById(departementId).orElse(null);
+        assert etudiant != null;
         etudiant.setDepartement(departement);
         etudiantRepository.save(etudiant);
 	}
@@ -60,8 +61,10 @@ public class EtudiantServiceImpl implements IEtudiantService{
 	public Etudiant addAndAssignEtudiantToEquipeAndContract(Etudiant e, Integer idContrat, Integer idEquipe){
 		Contrat c=contratRepository.findById(idContrat).orElse(null);
 		Equipe eq=equipeRepository.findById(idEquipe).orElse(null);
-		c.setEtudiant(e);
-		eq.getEtudiants().add(e);
+        assert c != null;
+        c.setEtudiant(e);
+        assert eq != null;
+        eq.getEtudiants().add(e);
 return e;
 	}
 
