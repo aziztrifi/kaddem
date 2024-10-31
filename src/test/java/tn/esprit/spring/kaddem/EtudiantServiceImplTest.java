@@ -51,6 +51,8 @@ public class EtudiantServiceImplTest {
         List<Etudiant> result = etudiantService.retrieveAllEtudiants();
 
         assertEquals(2, result.size());
+        assertTrue(result.contains(etudiant1));
+        assertTrue(result.contains(etudiant2));
     }
 
     @Test
@@ -73,6 +75,7 @@ public class EtudiantServiceImplTest {
         Etudiant updatedResult = etudiantService.updateEtudiant(savedEtudiant);
 
         assertEquals("Samuel", updatedResult.getNomE());
+        assertEquals(savedEtudiant.getIdEtudiant(), updatedResult.getIdEtudiant());
     }
 
     @Test
@@ -106,7 +109,36 @@ public class EtudiantServiceImplTest {
         Etudiant savedEtudiant = etudiantRepository.save(etudiant);
         etudiantService.assignEtudiantToDepartement(savedEtudiant.getIdEtudiant(), savedDepartement.getIdDepart());
 
-        Etudiant updatedEtudiant = etudiantRepository.findById(savedEtudiant.getIdEtudiant()).get();
+        Etudiant updatedEtudiant = etudiantRepository.findById(savedEtudiant.getIdEtudiant()).orElse(null);
+        assertNotNull(updatedEtudiant);
         assertEquals(savedDepartement.getIdDepart(), updatedEtudiant.getDepartement().getIdDepart());
+    }
+
+    @Test
+    void testRetrieveEtudiant_NonExistant() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            etudiantService.retrieveEtudiant(999);
+        });
+    }
+
+    @Test
+    void testAssignEtudiantToDepartement_NonExistantEtudiant() {
+        Departement departement = new Departement();
+        departement.setNomDepart("Engineering");
+        Departement savedDepartement = departementRepository.save(departement);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            etudiantService.assignEtudiantToDepartement(999, savedDepartement.getIdDepart());
+        });
+    }
+
+    @Test
+    void testAssignEtudiantToDepartement_NonExistantDepartement() {
+        Etudiant etudiant = new Etudiant("Bruce", "Wayne");
+        Etudiant savedEtudiant = etudiantRepository.save(etudiant);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            etudiantService.assignEtudiantToDepartement(savedEtudiant.getIdEtudiant(), 999);
+        });
     }
 }
