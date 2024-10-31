@@ -3,6 +3,7 @@ package tn.esprit.spring.kaddem;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -15,6 +16,7 @@ import tn.esprit.spring.kaddem.services.EquipeServiceImpl;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles("test") // Use the 'test' profile for H2 database
@@ -29,8 +31,9 @@ class EquipeServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        equipeRepository.deleteAll(); // Clear repository before each test
+        MockitoAnnotations.openMocks(this);
     }
+
 
     @AfterEach
     void tearDown() {
@@ -91,5 +94,24 @@ class EquipeServiceImplTest {
 
 
 
+    @Test
+    void retrieveAllEquipes_ShouldReturnListOfEquipes() {
+      
+        Equipe equipe1 = new Equipe();
+        equipe1.setNomEquipe("Team A");
+        Equipe equipe2 = new Equipe();
+        equipe2.setNomEquipe("Team B");
+
+        List<Equipe> mockEquipes = Arrays.asList(equipe1, equipe2);
+        when(equipeRepository.findAll()).thenReturn(mockEquipes);
+
+        // Act: call the service method
+        List<Equipe> equipes = equipeService.retrieveAllEquipes();
+
+        // Assert: verify the behavior and result
+        assertEquals(2, equipes.size());
+        assertEquals("Team A", equipes.get(0).getNomEquipe());
+        assertEquals("Team B", equipes.get(1).getNomEquipe());
+    }
 
 }
