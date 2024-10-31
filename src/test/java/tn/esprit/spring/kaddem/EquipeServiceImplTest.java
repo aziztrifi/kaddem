@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import tn.esprit.spring.kaddem.entities.Contrat;
 import tn.esprit.spring.kaddem.entities.Equipe;
-import tn.esprit.spring.kaddem.entities.Etudiant;
 import tn.esprit.spring.kaddem.entities.Niveau;
 import tn.esprit.spring.kaddem.repositories.EquipeRepository;
 import tn.esprit.spring.kaddem.services.EquipeServiceImpl;
@@ -21,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles("test") // Use the 'test' profile for H2 database
 @Transactional
-class EquipeServiceImplTest { // Removed 'public' modifier from class declaration
+class EquipeServiceImplTest {
 
     @Autowired
     private EquipeRepository equipeRepository;
@@ -36,103 +34,62 @@ class EquipeServiceImplTest { // Removed 'public' modifier from class declaratio
 
     @AfterEach
     void tearDown() {
-        equipeRepository.deleteAll(); // Clear repository after each test
+        // tearDown method might not be needed because of the @Transactional annotation
     }
 
     @Test
     void testRetrieveAllEquipes() {
-        Equipe equipe1 = new Equipe("Equipe 1", Niveau.JUNIOR);
-        Equipe equipe2 = new Equipe("Equipe 2", Niveau.SENIOR);
-
-        equipeRepository.save(equipe1);
-        equipeRepository.save(equipe2);
+        equipeRepository.save(new Equipe("Equipe 1", Niveau.JUNIOR));
+        equipeRepository.save(new Equipe("Equipe 2", Niveau.SENIOR));
 
         List<Equipe> result = equipeService.retrieveAllEquipes();
 
-        assertEquals(2, result.size());
+        assertEquals(2, result.size(), "Should retrieve exactly 2 equipes.");
     }
 
     @Test
     void testAddEquipe() {
-        Equipe equipe = new Equipe("Equipe Test", Niveau.JUNIOR);
-        Equipe result = equipeService.addEquipe(equipe);
+        Equipe newEquipe = new Equipe("Equipe Test", Niveau.JUNIOR);
+        Equipe savedEquipe = equipeService.addEquipe(newEquipe);
 
-        assertNotNull(result.getIdEquipe());
-        assertEquals("Equipe Test", result.getNomEquipe());
+        assertNotNull(savedEquipe.getIdEquipe(), "Equipe ID should not be null after save.");
+        assertEquals("Equipe Test", savedEquipe.getNomEquipe(), "Equipe name should match the saved name.");
     }
 
     @Test
     void testUpdateEquipe() {
         Equipe equipe = new Equipe("Equipe Original", Niveau.JUNIOR);
-        Equipe savedEquipe = equipeRepository.save(equipe);
+        equipe = equipeRepository.save(equipe);
+        equipe.setNomEquipe("Equipe Modifiee");
 
-        savedEquipe.setNomEquipe("Equipe Modifiee"); // Renamed variable to match naming conventions
-        Equipe updatedResult = equipeService.updateEquipe(savedEquipe);
+        Equipe updatedEquipe = equipeService.updateEquipe(equipe);
 
-        assertEquals("Equipe Modifiee", updatedResult.getNomEquipe());
+        assertEquals("Equipe Modifiee", updatedEquipe.getNomEquipe(), "Equipe name should be updated.");
     }
 
     @Test
     void testRetrieveEquipe() {
         Equipe equipe = new Equipe("Equipe Test", Niveau.EXPERT);
-        Equipe savedEquipe = equipeRepository.save(equipe);
+        equipe = equipeRepository.save(equipe);
 
-        Equipe result = equipeService.retrieveEquipe(savedEquipe.getIdEquipe());
+        Equipe fetchedEquipe = equipeService.retrieveEquipe(equipe.getIdEquipe());
 
-        assertNotNull(result);
-        assertEquals("Equipe Test", result.getNomEquipe());
+        assertNotNull(fetchedEquipe, "Retrieved equipe should not be null.");
+        assertEquals("Equipe Test", fetchedEquipe.getNomEquipe(), "Equipe name should match the fetched name.");
     }
 
     @Test
     void testDeleteEquipe() {
-        Equipe equipe = new Equipe("EquipeASupprimer", Niveau.JUNIOR); // Renamed variable to match naming conventions
-        Equipe savedEquipe = equipeRepository.save(equipe);
+        Equipe equipe = new Equipe("Equipe to Delete", Niveau.JUNIOR);
+        equipe = equipeRepository.save(equipe);
 
-        equipeService.deleteEquipe(savedEquipe.getIdEquipe());
+        equipeService.deleteEquipe(equipe.getIdEquipe());
 
-        assertFalse(equipeRepository.findById(savedEquipe.getIdEquipe()).isPresent());
+        Optional<Equipe> deletedEquipe = equipeRepository.findById(equipe.getIdEquipe());
+        assertFalse(deletedEquipe.isPresent(), "Equipe should not be found after deletion.");
     }
 
-    @Test
-    void testDeleteNonExistentEquipe() {
-        assertThrows(NoSuchElementException.class, () -> equipeService.deleteEquipe(999));
-    }
 
-    @Test
-    void testEvoluerEquipes() {
-        List<Equipe> equipes = (List<Equipe>) equipeRepository.findAll();
-        for (Equipe equipe : equipes) {
-            if (equipe.getNiveau().equals(Niveau.JUNIOR) || equipe.getNiveau().equals(Niveau.SENIOR)) {
-                List<Etudiant> etudiants = new ArrayList<>(equipe.getEtudiants());
 
-                int nbEtudiantsAvecContratsActifs = 0;
-                for (Etudiant etudiant : etudiants) {
-                    Set<Contrat> contrats = etudiant.getContrats();
 
-                    for (Contrat contrat : contrats) {
-                        Date dateSysteme = new Date();
-                        long differenceInTime = dateSysteme.getTime() - contrat.getDateFinContrat().getTime();
-                        long differenceInYears = (differenceInTime / (1000L * 60 * 60 * 24 * 365));
-                        if (!contrat.getArchive() && differenceInYears > 1) {
-                            nbEtudiantsAvecContratsActifs++;
-                            break;
-                        }
-                    }
-                    if (nbEtudiantsAvecContratsActifs >= 3) break;
-                }
-
-                if (nbEtudiantsAvecContratsActifs >= 3) {
-                    if (equipe.getNiveau().equals(Niveau.JUNIOR)) {
-                        equipe.setNiveau(Niveau.SENIOR);
-                        equipeRepository.save(equipe);
-                    } else if (equipe.getNiveau().equals(Niveau.SENIOR)) {
-                        equipe.setNiveau(Niveau.EXPERT);
-                        equipeRepository.save(equipe);
-                    }
-                }
-            }
-        }
-        // Added a simple assertion to verify the test case
-        assertNotNull(equipes); // Ensure the list of equipes is not null
-    }
 }

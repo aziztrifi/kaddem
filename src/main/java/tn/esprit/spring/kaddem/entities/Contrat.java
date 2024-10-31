@@ -95,4 +95,8 @@ public class Contrat implements Serializable{
     }
 
 
+    public boolean isActiveContract() {
+        return false;
+
+    }
 }
