@@ -104,7 +104,7 @@ public class ContratServiceImpl implements IContratService{
 
         // Calculate the difference in days and months
         long timeDifference = endDate.getTime() - startDate.getTime();
-        float daysDifference = timeDifference / (1000 * 60 * 60 * 24);
+        float daysDifference = (float) timeDifference / (1000 * 60 * 60 * 24);
         float monthsDifference = daysDifference / DAYS_IN_MONTH;
 
         // Calculate the revenue for the period
