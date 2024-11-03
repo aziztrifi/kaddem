@@ -2,7 +2,7 @@ version: "3.7"
 services:
   Kaddem:
     container_name: Kaddem
-    image: ayoub12/kaddem-2  # Use the pre-built image for the Kaddem service
+    image: ayoub12/kaddem-2
     ports:
       - "8089:8089"
     environment:
@@ -12,24 +12,33 @@ services:
     restart: always
     depends_on:
       - dbmysql
+    networks:
+      - my_network
 
   dbmysql:
     image: "mysql:5.6"
     container_name: dbmysql
     environment:
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes  # Corrected to be a list of environment variables
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
     ports:
       - "3306:3306"
     restart: always
     volumes:
       - db:/var/lib/mysql
+    networks:
+      - my_network
 
   angular-app:
-    image: ayoub12/kaddemangular:latest  # Use the pre-built Angular image (latest tag)
+    image: ayoub12/kaddemangular:latest
     container_name: angular-app
     ports:
-      - "4200:80"  # Ensure the ports match those used by your Angular application
-    restart: always  # Optional: always restart the container if it fails
+      - "4200:80"
+    restart: always
+    networks:
+      - my_network
 
 volumes:
   db:
+
+networks:
+  my_network:
