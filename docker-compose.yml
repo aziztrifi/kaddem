@@ -25,6 +25,13 @@ services:
     restart: unless-stopped
     volumes:
       - db:/var/lib/mysql
+      
+  angular-app:
+    image: ayoub12/kaddem:latest  # Spécifiez le nom de votre image et la version (dans cet exemple, "latest")
+    ports:
+      - "4200:80"  # Assurez-vous que les ports correspondent à ceux que vous utilisez dans votre application
+    restart: always  # Optionnel : redémarrer toujours le conteneur en cas d'échec
+
 
 
 volumes:
