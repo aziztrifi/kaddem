@@ -25,7 +25,7 @@ services:
       - db:/var/lib/mysql
 
   angular-app:
-    image: ayoub12/kaddem:latest  # Use the pre-built Angular image (latest tag)
+    image: ayoub12/kaddemangular:latest  # Use the pre-built Angular image (latest tag)
     container_name: angular-app
     ports:
       - "4200:80"  # Ensure the ports match those used by your Angular application
