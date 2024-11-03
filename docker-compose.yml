@@ -20,7 +20,7 @@ services:
       MYSQL_ROOT_PASSWORD: ""
     ports:
       - "3306:3306"
-    restart: unless-stopped
+    restart: always
     volumes:
       - db:/var/lib/mysql
 
