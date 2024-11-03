@@ -10,6 +10,7 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/departement")
+@CrossOrigin(origins = "http://localhost:4200")
 public class DepartementRestController {
 	IDepartementService departementService;
 	// http://localhost:8089/Kaddem/departement/retrieve-all-departements
@@ -26,7 +27,7 @@ public class DepartementRestController {
 
 	// http://localhost:8089/Kaddem/departement/add-departement
 	@PostMapping("/add-departement")
-	public Departement addDepartement(@RequestBody Departement d) {
+	public Departement addDepartement(@ModelAttribute Departement d) {
 		Departement departement = departementService.addDepartement(d);
 		return departement;
 	}
