@@ -15,7 +15,7 @@
     <description>kaddem</description>
     <properties>
         <java.version>1.8</java.version>
-        <sonar.token>squ_cb8d11958c6ae16f8d25263d1575ae5ac99b446f</sonar.token>
+        <sonar.token>squ_5516b929b29667672c85e848f72dca8bccf489e9</sonar.token>
     <sonar.host.url>http://192.168.50.4:9000</sonar.host.url>
     </properties>
     <distributionManagement>
