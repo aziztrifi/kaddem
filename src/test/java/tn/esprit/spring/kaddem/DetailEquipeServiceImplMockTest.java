@@ -1,3 +1,5 @@
+package tn.esprit.spring.kaddem;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -124,4 +126,3 @@ public class DetailEquipeServiceImplMockTest {
         verify(detailEquipeRepository, times(1)).findAll();
     }
 }
-
