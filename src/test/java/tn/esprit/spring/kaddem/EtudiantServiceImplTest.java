@@ -116,9 +116,10 @@ public class EtudiantServiceImplTest {
 
     @Test
     void testRetrieveEtudiant_NonExistant() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             etudiantService.retrieveEtudiant(999);
         });
+        assertEquals("Étudiant non trouvé avec l'ID: 999", exception.getMessage());
     }
 
     @Test
@@ -127,9 +128,10 @@ public class EtudiantServiceImplTest {
         departement.setNomDepart("Engineering");
         Departement savedDepartement = departementRepository.save(departement);
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             etudiantService.assignEtudiantToDepartement(999, savedDepartement.getIdDepart());
         });
+        assertEquals("Étudiant non trouvé avec l'ID: 999", exception.getMessage());
     }
 
     @Test
@@ -137,8 +139,9 @@ public class EtudiantServiceImplTest {
         Etudiant etudiant = new Etudiant("Bruce", "Wayne");
         Etudiant savedEtudiant = etudiantRepository.save(etudiant);
 
-        assertThrows(IllegalArgumentException.class, () -> {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             etudiantService.assignEtudiantToDepartement(savedEtudiant.getIdEtudiant(), 999);
         });
+        assertEquals("Département non trouvé avec l'ID: 999", exception.getMessage());
     }
 }
