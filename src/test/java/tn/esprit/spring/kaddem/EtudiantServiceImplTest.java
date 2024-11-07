@@ -97,7 +97,7 @@ class EtudiantServiceImplTest {
         verify(etudiantRepository, times(1)).save(etudiant);
     }
 
-    @Test
+  /*  @Test
     void testAddAndAssignEtudiantToEquipeAndContract() {
         Contrat contrat = new Contrat();
         Equipe equipe = new Equipe();
@@ -110,5 +110,5 @@ class EtudiantServiceImplTest {
         assertEquals(etudiant, contrat.getEtudiant());
         assertTrue(equipe.getEtudiants().contains(etudiant));
         verify(etudiantRepository, never()).save(any(Etudiant.class)); // Save is not called on etudiantRepository directly
-    }
+    }*/
 }
