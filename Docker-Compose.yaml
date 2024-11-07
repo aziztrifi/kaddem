@@ -26,11 +26,4 @@ services:
       - mysql
     restart: on-failure
 
-  frontend:
-    image: angular-frontend
-    container_name: frontend-container
-    ports:
-      - "4200:80"  # Expose the frontend on port 4200
-    depends_on:
-      - spring-app
-    restart: on-failure
+  
