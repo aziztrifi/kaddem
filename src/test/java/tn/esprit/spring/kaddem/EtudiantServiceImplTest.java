@@ -51,8 +51,8 @@ public class EtudiantServiceImplTest {
         List<Etudiant> result = etudiantService.retrieveAllEtudiants();
 
         assertEquals(2, result.size());
-        assertTrue(result.contains(etudiant1));
-        assertTrue(result.contains(etudiant2));
+        assertTrue(result.stream().anyMatch(e -> e.getNomE().equals("John") && e.getPrenomE().equals("Doe")));
+        assertTrue(result.stream().anyMatch(e -> e.getNomE().equals("Jane") && e.getPrenomE().equals("Doe")));
     }
 
     @Test
