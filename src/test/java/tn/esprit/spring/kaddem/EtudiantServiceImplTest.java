@@ -64,6 +64,10 @@ public class EtudiantServiceImplTest {
         assertNotNull(result.getIdEtudiant());
         assertEquals("Alice", result.getNomE());
         assertEquals("Wonderland", result.getPrenomE());
+
+        // Vérifie que l'étudiant a bien été ajouté dans la base
+        Etudiant savedEtudiant = etudiantRepository.findById(result.getIdEtudiant()).orElse(null);
+        assertNotNull(savedEtudiant);
     }
 
     @Test
@@ -112,6 +116,9 @@ public class EtudiantServiceImplTest {
         Etudiant updatedEtudiant = etudiantRepository.findById(savedEtudiant.getIdEtudiant()).orElse(null);
         assertNotNull(updatedEtudiant);
         assertEquals(savedDepartement.getIdDepart(), updatedEtudiant.getDepartement().getIdDepart());
+
+        // Vérifie aussi que le département n'est pas null
+        assertNotNull(updatedEtudiant.getDepartement());
     }
 
     @Test
