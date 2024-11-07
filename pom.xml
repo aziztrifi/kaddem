@@ -23,11 +23,11 @@
             <name>Nexus Repository</name>
             <url>http://192.168.50.4:8081/repository/kaddem-release/</url>
         </repository>
-        <snapshotRepository>
+        <!--<snapshotRepository>
             <id>deploymentSnapshotRepo</id>
             <name>Nexus Snapshot Repository</name>
             <url>http://192.168.50.4:8081/repository/kaddem-snapshots/</url>
-        </snapshotRepository>
+        </snapshotRepository>-->
     </distributionManagement>
     <dependencies>
         <dependency>
