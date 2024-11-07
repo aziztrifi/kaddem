@@ -65,7 +65,7 @@ public class EtudiantServiceImplTest {
         assertEquals("Alice", result.getNomE());
         assertEquals("Wonderland", result.getPrenomE());
 
-        // Vérifie que l'étudiant a bien été ajouté dans la base
+        // Verify that the student was saved in the database
         Etudiant savedEtudiant = etudiantRepository.findById(result.getIdEtudiant()).orElse(null);
         assertNotNull(savedEtudiant);
     }
@@ -117,13 +117,13 @@ public class EtudiantServiceImplTest {
         assertNotNull(updatedEtudiant);
         assertEquals(savedDepartement.getIdDepart(), updatedEtudiant.getDepartement().getIdDepart());
 
-        // Vérifie aussi que le département n'est pas null
+        // Verify the department is not null
         assertNotNull(updatedEtudiant.getDepartement());
     }
 
     @Test
     void testRetrieveEtudiant_NonExistant() {
-        // Cas où l'étudiant n'existe pas
+        // Case where the student does not exist
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             etudiantService.retrieveEtudiant(999);
         });
@@ -132,7 +132,7 @@ public class EtudiantServiceImplTest {
 
     @Test
     void testAssignEtudiantToDepartement_NonExistantEtudiant() {
-        // Cas où l'étudiant n'existe pas
+        // Case where the student does not exist
         Departement departement = new Departement();
         departement.setNomDepart("Engineering");
         Departement savedDepartement = departementRepository.save(departement);
@@ -145,7 +145,7 @@ public class EtudiantServiceImplTest {
 
     @Test
     void testAssignEtudiantToDepartement_NonExistantDepartement() {
-        // Cas où le département n'existe pas
+        // Case where the department does not exist
         Etudiant etudiant = new Etudiant("Bruce", "Wayne");
         Etudiant savedEtudiant = etudiantRepository.save(etudiant);
 
