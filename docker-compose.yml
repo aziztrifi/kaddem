@@ -2,7 +2,7 @@ version: "3.7"
 services:
   Kaddem:
     container_name: Kaddem
-    image: jiheeed002/kaddem-10
+    image: jiheeed002/kaddem-11
     ports:
       - "8089:8089"
     environment:
