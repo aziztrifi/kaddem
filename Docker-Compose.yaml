@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   mysql:
     image: mysql:latest
@@ -9,6 +11,7 @@ services:
       MYSQL_PASSWORD: user
     ports:
       - "3306:3306"
+    restart: on-failure
 
   spring-app:
     image: azizhex/kaddem03app:v1.0
@@ -21,4 +24,13 @@ services:
       SPRING_DATASOURCE_PASSWORD: user
     depends_on:
       - mysql
+    restart: on-failure
+
+  frontend:
+    image: angular-frontend
+    container_name: frontend-container
+    ports:
+      - "4200:80"  # Expose the frontend on port 4200
+    depends_on:
+      - spring-app
     restart: on-failure
