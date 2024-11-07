@@ -116,6 +116,7 @@ public class EtudiantServiceImplTest {
 
     @Test
     void testRetrieveEtudiant_NonExistant() {
+        // Cas où l'étudiant n'existe pas
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             etudiantService.retrieveEtudiant(999);
         });
@@ -124,6 +125,7 @@ public class EtudiantServiceImplTest {
 
     @Test
     void testAssignEtudiantToDepartement_NonExistantEtudiant() {
+        // Cas où l'étudiant n'existe pas
         Departement departement = new Departement();
         departement.setNomDepart("Engineering");
         Departement savedDepartement = departementRepository.save(departement);
@@ -136,6 +138,7 @@ public class EtudiantServiceImplTest {
 
     @Test
     void testAssignEtudiantToDepartement_NonExistantDepartement() {
+        // Cas où le département n'existe pas
         Etudiant etudiant = new Etudiant("Bruce", "Wayne");
         Etudiant savedEtudiant = etudiantRepository.save(etudiant);
 
