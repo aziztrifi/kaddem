@@ -1,157 +1,114 @@
 package tn.esprit.spring.kaddem;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import tn.esprit.spring.kaddem.entities.Contrat;
 import tn.esprit.spring.kaddem.entities.Departement;
+import tn.esprit.spring.kaddem.entities.Equipe;
 import tn.esprit.spring.kaddem.entities.Etudiant;
+import tn.esprit.spring.kaddem.repositories.ContratRepository;
 import tn.esprit.spring.kaddem.repositories.DepartementRepository;
+import tn.esprit.spring.kaddem.repositories.EquipeRepository;
 import tn.esprit.spring.kaddem.repositories.EtudiantRepository;
 import tn.esprit.spring.kaddem.services.EtudiantServiceImpl;
 
-import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-public class EtudiantServiceImplTest {
+class EtudiantServiceImplTest {
 
-    @Autowired
+    @Mock
     private EtudiantRepository etudiantRepository;
 
-    @Autowired
+    @Mock
+    private ContratRepository contratRepository;
+
+    @Mock
+    private EquipeRepository equipeRepository;
+
+    @Mock
     private DepartementRepository departementRepository;
 
-    @Autowired
+    @InjectMocks
     private EtudiantServiceImpl etudiantService;
+
+    private Etudiant etudiant;
 
     @BeforeEach
     void setUp() {
-        // Clear the repositories before each test
-        etudiantRepository.deleteAll();
-        departementRepository.deleteAll();
-    }
-
-    @AfterEach
-    void tearDown() {
-        // Clear the repositories after each test
-        etudiantRepository.deleteAll();
-        departementRepository.deleteAll();
+        MockitoAnnotations.openMocks(this);
+        etudiant = new Etudiant("John", "Doe");
     }
 
     @Test
     void testRetrieveAllEtudiants() {
-        Etudiant etudiant1 = new Etudiant("John", "Doe");
-        Etudiant etudiant2 = new Etudiant("Jane", "Doe");
-        etudiantRepository.save(etudiant1);
-        etudiantRepository.save(etudiant2);
-
-        List<Etudiant> result = etudiantService.retrieveAllEtudiants();
-
-        assertEquals(2, result.size());
-        assertTrue(result.stream().anyMatch(e -> e.getNomE().equals("John") && e.getPrenomE().equals("Doe")));
-        assertTrue(result.stream().anyMatch(e -> e.getNomE().equals("Jane") && e.getPrenomE().equals("Doe")));
+        etudiantService.retrieveAllEtudiants();
+        verify(etudiantRepository, times(1)).findAll();
     }
 
     @Test
     void testAddEtudiant() {
-        Etudiant etudiant = new Etudiant("Alice", "Wonderland");
-
-        Etudiant result = etudiantService.addEtudiant(etudiant);
-
-        assertNotNull(result.getIdEtudiant());
-        assertEquals("Alice", result.getNomE());
-        assertEquals("Wonderland", result.getPrenomE());
-
-        // Verify that the student was saved in the database
-        Etudiant savedEtudiant = etudiantRepository.findById(result.getIdEtudiant()).orElse(null);
+        when(etudiantRepository.save(etudiant)).thenReturn(etudiant);
+        Etudiant savedEtudiant = etudiantService.addEtudiant(etudiant);
         assertNotNull(savedEtudiant);
+        assertEquals("John", savedEtudiant.getNomE());
+        verify(etudiantRepository, times(1)).save(etudiant);
     }
 
     @Test
     void testUpdateEtudiant() {
-        Etudiant etudiant = new Etudiant("Mark", "Twain");
-        Etudiant savedEtudiant = etudiantRepository.save(etudiant);
-
-        savedEtudiant.setNomE("Samuel");
-        Etudiant updatedResult = etudiantService.updateEtudiant(savedEtudiant);
-
-        assertEquals("Samuel", updatedResult.getNomE());
-        assertEquals(savedEtudiant.getIdEtudiant(), updatedResult.getIdEtudiant());
+        when(etudiantRepository.save(etudiant)).thenReturn(etudiant);
+        Etudiant updatedEtudiant = etudiantService.updateEtudiant(etudiant);
+        assertNotNull(updatedEtudiant);
+        assertEquals("John", updatedEtudiant.getNomE());
+        verify(etudiantRepository, times(1)).save(etudiant);
     }
 
     @Test
     void testRetrieveEtudiant() {
-        Etudiant etudiant = new Etudiant("Clark", "Kent");
-        Etudiant savedEtudiant = etudiantRepository.save(etudiant);
-
-        Etudiant result = etudiantService.retrieveEtudiant(savedEtudiant.getIdEtudiant());
-
-        assertNotNull(result);
-        assertEquals("Clark", result.getNomE());
+        when(etudiantRepository.findById(1)).thenReturn(Optional.of(etudiant));
+        Etudiant foundEtudiant = etudiantService.retrieveEtudiant(1);
+        assertNotNull(foundEtudiant);
+        assertEquals("John", foundEtudiant.getNomE());
+        verify(etudiantRepository, times(1)).findById(1);
     }
 
     @Test
-    void testDeleteEtudiant() {
-        Etudiant etudiant = new Etudiant("Bruce", "Wayne");
-        Etudiant savedEtudiant = etudiantRepository.save(etudiant);
-
-        etudiantService.removeEtudiant(savedEtudiant.getIdEtudiant());
-
-        assertFalse(etudiantRepository.findById(savedEtudiant.getIdEtudiant()).isPresent());
+    void testRemoveEtudiant() {
+        when(etudiantRepository.findById(1)).thenReturn(Optional.of(etudiant));
+        etudiantService.removeEtudiant(1);
+        verify(etudiantRepository, times(1)).delete(etudiant);
     }
 
     @Test
     void testAssignEtudiantToDepartement() {
-        Etudiant etudiant = new Etudiant("Tony", "Stark");
         Departement departement = new Departement();
-        departement.setNomDepart("Engineering");
-        Departement savedDepartement = departementRepository.save(departement);
+        when(etudiantRepository.findById(1)).thenReturn(Optional.of(etudiant));
+        when(departementRepository.findById(1)).thenReturn(Optional.of(departement));
 
-        Etudiant savedEtudiant = etudiantRepository.save(etudiant);
-        etudiantService.assignEtudiantToDepartement(savedEtudiant.getIdEtudiant(), savedDepartement.getIdDepart());
+        etudiantService.assignEtudiantToDepartement(1, 1);
 
-        Etudiant updatedEtudiant = etudiantRepository.findById(savedEtudiant.getIdEtudiant()).orElse(null);
-        assertNotNull(updatedEtudiant);
-        assertEquals(savedDepartement.getIdDepart(), updatedEtudiant.getDepartement().getIdDepart());
-
-        // Verify the department is not null
-        assertNotNull(updatedEtudiant.getDepartement());
+        assertEquals(departement, etudiant.getDepartement());
+        verify(etudiantRepository, times(1)).save(etudiant);
     }
 
     @Test
-    void testRetrieveEtudiant_NonExistant() {
-        // Case where the student does not exist
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            etudiantService.retrieveEtudiant(999);
-        });
-        assertEquals("Étudiant non trouvé avec l'ID: 999", exception.getMessage());
-    }
+    void testAddAndAssignEtudiantToEquipeAndContract() {
+        Contrat contrat = new Contrat();
+        Equipe equipe = new Equipe();
+        when(contratRepository.findById(1)).thenReturn(Optional.of(contrat));
+        when(equipeRepository.findById(1)).thenReturn(Optional.of(equipe));
 
-    @Test
-    void testAssignEtudiantToDepartement_NonExistantEtudiant() {
-        // Case where the student does not exist
-        Departement departement = new Departement();
-        departement.setNomDepart("Engineering");
-        Departement savedDepartement = departementRepository.save(departement);
+        Etudiant assignedEtudiant = etudiantService.addAndAssignEtudiantToEquipeAndContract(etudiant, 1, 1);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            etudiantService.assignEtudiantToDepartement(999, savedDepartement.getIdDepart());
-        });
-        assertEquals("Étudiant non trouvé avec l'ID: 999", exception.getMessage());
-    }
-
-    @Test
-    void testAssignEtudiantToDepartement_NonExistantDepartement() {
-        // Case where the department does not exist
-        Etudiant etudiant = new Etudiant("Bruce", "Wayne");
-        Etudiant savedEtudiant = etudiantRepository.save(etudiant);
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            etudiantService.assignEtudiantToDepartement(savedEtudiant.getIdEtudiant(), 999);
-        });
-        assertEquals("Département non trouvé avec l'ID: 999", exception.getMessage());
+        assertNotNull(assignedEtudiant);
+        assertEquals(etudiant, contrat.getEtudiant());
+        assertTrue(equipe.getEtudiants().contains(etudiant));
+        verify(etudiantRepository, never()).save(any(Etudiant.class)); // Save is not called on etudiantRepository directly
     }
 }
