@@ -24,12 +24,10 @@ public class Equipe implements Serializable{
     private DetailEquipe detailEquipe;
 
     public Equipe() {
-        // TODO Auto-generated constructor stub
+
     }
 
-    public Equipe(String nomEquipe) {
-        this.nomEquipe = nomEquipe;
-    }
+
 
     public Equipe(String nomEquipe, Niveau niveau) {
         super();
@@ -44,20 +42,7 @@ public class Equipe implements Serializable{
         this.niveau = niveau;
     }
 
-    public Equipe(String nomEquipe, Niveau niveau, Set<Etudiant> etudiants, DetailEquipe detailEquipe) {
-        this.nomEquipe = nomEquipe;
-        this.niveau = niveau;
-        this.etudiants = etudiants;
-        this.detailEquipe = detailEquipe;
-    }
 
-    public Equipe(Integer idEquipe, String nomEquipe, Niveau niveau, Set<Etudiant> etudiants, DetailEquipe detailEquipe) {
-        this.idEquipe = idEquipe;
-        this.nomEquipe = nomEquipe;
-        this.niveau = niveau;
-        this.etudiants = etudiants;
-        this.detailEquipe = detailEquipe;
-    }
 
     public Set<Etudiant> getEtudiants() {
         return etudiants;
@@ -67,20 +52,10 @@ public class Equipe implements Serializable{
         this.etudiants = etudiants;
     }
 
-    public DetailEquipe getDetailEquipe() {
-        return detailEquipe;
-    }
-
-    public void setDetailEquipe(DetailEquipe detailEquipe) {
-        this.detailEquipe = detailEquipe;
-    }
-
     public Integer getIdEquipe() {
         return idEquipe;
     }
-    public void setIdEquipe(Integer idEquipe) {
-        this.idEquipe = idEquipe;
-    }
+
     public String getNomEquipe() {
         return nomEquipe;
     }

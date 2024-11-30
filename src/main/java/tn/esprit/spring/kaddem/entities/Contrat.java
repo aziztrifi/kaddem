@@ -25,7 +25,7 @@ public class Contrat implements Serializable{
     private Etudiant etudiant;
 
     public Contrat() {
-        // TODO Auto-generated constructor stub
+
     }
 
     public Contrat(Date dateDebutContrat, Date dateFinContrat, Specialite specialite, Boolean archive,
@@ -95,4 +95,8 @@ public class Contrat implements Serializable{
     }
 
 
+    public boolean isActiveContract() {
+        return false;
+
+    }
 }

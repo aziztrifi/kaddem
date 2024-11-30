@@ -1,6 +1,5 @@
 package tn.esprit.spring.kaddem.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tn.esprit.spring.kaddem.entities.Departement;
 import tn.esprit.spring.kaddem.entities.Universite;
@@ -10,44 +9,61 @@ import tn.esprit.spring.kaddem.repositories.UniversiteRepository;
 import java.util.List;
 import java.util.Set;
 
+
 @Service
-public class UniversiteServiceImpl implements IUniversiteService{
-@Autowired
-    UniversiteRepository universiteRepository;
-@Autowired
-    DepartementRepository departementRepository;
-    public UniversiteServiceImpl() {
-        // TODO Auto-generated constructor stub
-    }
-  public   List<Universite> retrieveAllUniversites(){
-return (List<Universite>) universiteRepository.findAll();
+public class UniversiteServiceImpl implements IUniversiteService {
+
+    private final UniversiteRepository universiteRepository;
+    private final DepartementRepository departementRepository;
+
+    public UniversiteServiceImpl(DepartementRepository departementRepository, UniversiteRepository universiteRepository) {
+        this.departementRepository = departementRepository;
+        this.universiteRepository = universiteRepository;
     }
 
- public    Universite addUniversite (Universite  u){
-return  (universiteRepository.save(u));
+    @Override
+    public List<Universite> retrieveAllUniversites() {
+        return (List<Universite>) universiteRepository.findAll();
     }
 
- public    Universite updateUniversite (Universite  u){
-     return  (universiteRepository.save(u));
+    @Override
+    public Universite addUniversite(Universite u) {
+        return universiteRepository.save(u);
     }
 
-  public Universite retrieveUniversite (Integer idUniversite){
-Universite u = universiteRepository.findById(idUniversite).get();
-return  u;
-    }
-    public  void deleteUniversite(Integer idUniversite){
-        universiteRepository.delete(retrieveUniversite(idUniversite));
+    @Override
+    public Universite updateUniversite(Universite u) {
+        return universiteRepository.save(u);
     }
 
-    public void assignUniversiteToDepartement(Integer idUniversite, Integer idDepartement){
-        Universite u= universiteRepository.findById(idUniversite).orElse(null);
-        Departement d= departementRepository.findById(idDepartement).orElse(null);
-        u.getDepartements().add(d);
-        universiteRepository.save(u);
+    @Override
+    public Universite retrieveUniversite(Integer idUniversite) {
+        return universiteRepository.findById(idUniversite)
+                .orElseThrow(() -> new IllegalArgumentException("University not found with id: " + idUniversite));
     }
 
-    public Set<Departement> retrieveDepartementsByUniversite(Integer idUniversite){
-Universite u=universiteRepository.findById(idUniversite).orElse(null);
-return u.getDepartements();
+    @Override
+    public void deleteUniversite(Integer idUniversite) {
+        Universite universite = retrieveUniversite(idUniversite);
+        universiteRepository.delete(universite);
+    }
+
+    @Override
+    public void assignUniversiteToDepartement(Integer idUniversite, Integer idDepartement) {
+        Universite universite = universiteRepository.findById(idUniversite)
+                .orElseThrow(() -> new IllegalArgumentException("Universite not found with id: " + idUniversite));
+        Departement departement = departementRepository.findById(idDepartement)
+                .orElseThrow(() -> new IllegalArgumentException("Departement not found with id: " + idDepartement));
+
+        universite.getDepartements().add(departement);
+        universiteRepository.save(universite);
+    }
+
+    @Override
+    public Set<Departement> retrieveDepartementsByUniversite(Integer idUniversite) {
+        Universite universite = universiteRepository.findById(idUniversite)
+                .orElseThrow(() -> new IllegalArgumentException("Universite not found with id: " + idUniversite));
+
+        return universite.getDepartements();
     }
 }
